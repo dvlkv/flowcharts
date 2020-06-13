@@ -4,6 +4,6 @@ require('./index.less');
 
 export default React.memo(() => {
   return (
-    <div className={'loh'}>лох</div>
+    <div className={'loh'}>Constructor</div>
   )
 })

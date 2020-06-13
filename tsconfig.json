@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "outDir": "./dist/",
-      "noImplicitAny": false,
+      "noImplicitAny": true,
       "module": "esnext",
       "moduleResolution": "node",
       "lib": ["ES2018", "DOM"],

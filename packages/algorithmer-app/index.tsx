@@ -1,19 +1,13 @@
+// Must be the first import
+import { Suspense } from "preact/compat/src/suspense";
+
+if (process.env.NODE_ENV==='development') {
+  // Must use require here as import statements are only allowed
+  // to exist at the top of a file.
+  require("preact/debug");
+}
+
 import { render } from 'preact';
-import React, { lazy, memo, Suspense } from 'preact/compat';
+import App from "./pages";
 
-const ConstructorPage = lazy(() => import('./pages/ConstuctorPage'));
-
-const App = memo(() => {
-  document.title = 'OpenBots';
-
-  return (
-    <div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <ConstructorPage/>
-      </Suspense>
-      <div className={'pidor'}>Max pidor</div>
-    </div>
-  );
-});
-
-render(<App/>, document.getElementById('root')!);
+render(<App />, document.getElementById('root')!);

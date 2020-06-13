@@ -9,7 +9,7 @@ module.exports = {
     app:  path.join(__dirname, 'packages', 'algorithmer-app', 'index.tsx')
   },
   target: 'web',
-  mode: 'production',
+  mode: 'development',
   module: {
     rules: [
       {
@@ -46,7 +46,10 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.less']
+    extensions: ['.tsx', '.ts', '.js', '.less'],
+    alias: {
+      "createElement": "h"
+    }
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -68,6 +71,7 @@ module.exports = {
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
+    historyApiFallback: true,
     compress: true,
     port: 9000
   },
