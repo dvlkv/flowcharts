@@ -1,9 +1,12 @@
-import { memo } from "preact/compat";
+import { memo, Fragment } from "preact/compat";
 import Router from "preact-router";
 import AsyncRoute from "preact-async-route";
-import { Redirect } from "../../algorithmer-misc/Redirect";
+import { Redirect } from "../../algorithmer-misc";
+import Navbar from "../../algorithmer-navbar";
 
-const App = memo(() => {
+require('./index.less');
+
+const Content = memo(() => {
   document.title = 'OpenBots';
 
   return (
@@ -13,6 +16,19 @@ const App = memo(() => {
       <Redirect default to={'/dashboard'} />
     </Router>
   );
+});
+
+
+
+const App = memo(() => {
+  return (
+    <Fragment>
+      <Content />
+      <div className={'navbar-container'}>
+        <Navbar routes={[{ link: '/dashboard', text: 'Dashboard' }, { link: '/constructor', text: 'Constructor' }]} />
+      </div>
+    </Fragment>
+  )
 });
 
 export default App;
