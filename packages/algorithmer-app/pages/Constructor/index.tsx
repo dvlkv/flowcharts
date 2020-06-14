@@ -1,9 +1,9 @@
-import React from 'preact/compat';
 require('./index.less');
 
-
-export default React.memo(() => {
+const Constructor = () => {
   return (
-    <div className={'loh'}>Constructor</div>
+    <div>Constructor</div>
   )
-})
+};
+
+export default Constructor;

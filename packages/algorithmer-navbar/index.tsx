@@ -6,7 +6,7 @@ require('./index.less');
 
 type NavbarItemProps = {
   link: string,
-  text: string
+  text: any
 }
 
 type NavbarProps = {

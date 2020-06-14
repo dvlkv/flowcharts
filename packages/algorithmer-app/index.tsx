@@ -1,4 +1,6 @@
 // Must be the first import
+import { LocaleProvider } from "../algorithmer-locale";
+
 if (process.env.NODE_ENV==='development') {
   // Must use require here as import statements are only allowed
   // to exist at the top of a file.
@@ -8,4 +10,8 @@ if (process.env.NODE_ENV==='development') {
 import { render } from 'preact';
 import App from "./pages";
 
-render(<App />, document.getElementById('root')!);
+render(
+  <LocaleProvider defaultLocale={'RU'}>
+    <App />
+  </LocaleProvider>
+  , document.getElementById('root')!);
