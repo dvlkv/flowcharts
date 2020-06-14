@@ -1,8 +1,13 @@
+import { Fragment } from "preact";
+import { Canvas } from "../../../algorithmer-canvas";
+
 require('./index.less');
 
 const Constructor = () => {
   return (
-    <div>Constructor</div>
+    <Fragment>
+      <Canvas className={'constructor-canvas'} />
+    </Fragment>
   )
 };
 

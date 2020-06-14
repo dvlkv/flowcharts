@@ -1,13 +1,23 @@
 #root {
   height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: table;
 }
 
 .content-container {
-  padding-bottom: 50px; // sync with navbar size
+  overflow: hidden;
+  height: 100%;
+  padding-bottom: 50px;
 }
 
 .navbar-container {
-  bottom: 0;
-  position: absolute;
   width: 100%;
+  position: fixed;
+  bottom: 0;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 32pt;
 }

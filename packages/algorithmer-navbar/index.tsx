@@ -1,6 +1,6 @@
 import { memo } from "preact/compat";
 import Match, { Link } from "preact-router/match";
-import { cx } from "../algorithmer-misc";
+import { cx } from "../algorithmer-utils";
 
 require('./index.less');
 

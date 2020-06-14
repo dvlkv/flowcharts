@@ -1,4 +1,4 @@
-@import "../algorithmer-misc/index";
+@import "../algorithmer-utils/index";
 @navbar-height: 50px;
 
 .navbar {
@@ -20,6 +20,10 @@
   text-transform: uppercase;
   transition: background-color .1s ease-in-out;
   .flex-center;
+
+  &:focus {
+    outline: 0;
+  }
 
   &:last-child {
     margin-right: 0;

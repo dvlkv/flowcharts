@@ -1,7 +1,7 @@
 import { memo, Fragment } from "preact/compat";
 import Router from "preact-router";
 import AsyncRoute from "preact-async-route";
-import { Redirect } from "../../algorithmer-misc";
+import { Redirect } from "../../algorithmer-utils";
 import Navbar from "../../algorithmer-navbar";
 import { Span } from "../../algorithmer-locale";
 
@@ -36,7 +36,9 @@ const Content = memo(() => {
 const App = memo(() => {
   return (
     <Fragment>
-      <Content/>
+      <div className={'content-container'}>
+        <Content/>
+      </div>
       <div className={'navbar-container'}>
         <Navbar routes={[
           { link: '/dashboard', text: <Span text="DASHBOARD_PAGE" /> },
