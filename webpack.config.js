@@ -28,6 +28,7 @@ module.exports = {
                 import: 'h',
                 export: 'h',
               }],
+              ["@babel/plugin-proposal-class-properties"]
             ]
           }
         }],
