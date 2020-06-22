@@ -15,26 +15,50 @@
 .constructor-branch-outer {
   overflow-x: auto;
   position: relative;
+
+  &::before {
+    content: '';
+    height: 1px;
+    width: 100%;
+    margin: auto;
+    position: absolute;
+    background-color: black;
+    display: block;
+    top: 0;
+  }
+
+  &::after {
+    content: '';
+    height: 1px;
+    width: 100%;
+    position: absolute;
+    background-color: black;
+    display: block;
+    bottom: 0;
+  }
 }
 .constructor-branch {
   width: 100%;
-  padding: 12px 24px;
+  padding: 24px 48px;
   display: flex;
   flex-direction: row;
-
-  &:before {
-    height: 1px;
-    background-color: black;
-    display: block;
-  }
-
-  &:after {
-    width: 100%;
-    height: 1px;
-    display: block;
-  }
 }
 
+
+.constructor-block-outer {
+  padding-bottom: 12px;
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &.drag-over {
+    padding-top: 104px;
+
+    & * {
+      pointer-events: none;
+    }
+  }
+}
 
 .constructor-block {
   width: 240px;
@@ -44,11 +68,6 @@
   position: relative;
   padding: 4px 8px;
   border-radius: 4px;
-  margin-bottom: 12px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 
   &.linking {
     cursor: pointer;

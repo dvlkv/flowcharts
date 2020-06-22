@@ -1,27 +1,10 @@
 import { memo } from "preact/compat";
 import { createContext } from "preact";
-import { useEffect, useState } from "preact/hooks";
-import { useShortcuts } from "../../../../algorithmer-utils/shortcuts";
+import { useContext, useEffect, useState } from "preact/hooks";
+import { useMouse, useShortcuts } from "../../../../algorithmer-utils/shortcuts";
 import { cx } from "../../../../algorithmer-utils";
 
-const useMousePosition = () => {
-  let [mousePos, setMousePos] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: e.x,
-        y: e.y
-      });
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-    };
-  }, []);
-
-  return mousePos;
-};
+export const LinkerContext = createContext<ArrowsMutations & { linkingId: string | undefined, parent: DOMRect, parentScrollLeft: number } | null>(null);
 
 const Arrow = memo(({ from, to }: any) => {
   let path = `M0.5 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
@@ -75,6 +58,28 @@ const Arrow = memo(({ from, to }: any) => {
   )
 });
 
+const UnlinkedArrow = memo(({ obj }: any) => {
+  const ctx = useContext(LinkerContext);
+  if (!ctx) {
+    return null;
+  }
+
+  const mousePos = useMouse();
+  const { from, to } = {
+    from: {
+      x: obj.endX - ctx.parent.x,
+      y: obj.endY - ctx.parent.y,
+    },
+    to: {
+      x: Math.max(obj.endX - ctx.parent.x + 20, mousePos.x - ctx.parent.x + ctx.parentScrollLeft),
+      y: mousePos.y ? mousePos.y - ctx.parent.y : obj.endY - ctx.parent.y
+    }
+  };
+  return (
+    <Arrow from={from} to={to} />
+  )
+});
+
 type LinkerObject = { startX: number, startY: number, endX: number, endY: number };
 
 type ArrowsState = {
@@ -82,13 +87,11 @@ type ArrowsState = {
 }
 
 type ArrowsMutations = {
-  useObject: (id: string, obj: LinkerObject) => void,
+  useObject: (id: string, obj: LinkerObject | null) => void,
   startLinking: (id: string) => void,
   endLinking: (id: string) => void,
 }
-
-export const LinkerContext = createContext<ArrowsState & ArrowsMutations & { linkingId: string | undefined } | null>(null);
-export const Linker = memo(({ children, mappings, parent }: any) => {
+export const Linker = memo(({ children, mappings, parent, parentScrollLeft }: any) => {
   let [state, mutate] = useState<ArrowsState>({
     objects: new Map<string, { startX: number, startY: number, endX: number, endY: number }>(),
   });
@@ -98,9 +101,14 @@ export const Linker = memo(({ children, mappings, parent }: any) => {
 
   const mutations: ArrowsMutations = {
     useObject: (id: string, obj) => {
+      if (obj) {
+        state.objects.set(id, obj);
+      } else {
+        state.objects.delete(id);
+      }
       mutate({
         ...state,
-        objects: state.objects.set(id, obj),
+        objects: state.objects,
       });
     },
     startLinking: (id) => {
@@ -135,7 +143,6 @@ export const Linker = memo(({ children, mappings, parent }: any) => {
     })
   }
 
-  let mousePos = useMousePosition();
   useShortcuts([{
     code: 'Escape',
     handler: () => {
@@ -143,27 +150,17 @@ export const Linker = memo(({ children, mappings, parent }: any) => {
     }
   }]);
 
+  let linkingObj: any;
   if (linkingId) {
-    let linkingObj = state.objects.get(linkingId);
-    if (linkingObj) {
-      arrows.push({
-        from: {
-          x: linkingObj.endX - parent.x,
-          y: linkingObj.endY - parent.y,
-        },
-        to: {
-          x: Math.max(linkingObj.endX - parent.x + 20, mousePos.x - parent.x),
-          y: mousePos.y - parent.y
-        }
-      });
-    }
+    linkingObj = state.objects.get(linkingId);
   }
 
   return (
-    <LinkerContext.Provider value={{ ...state, ...mutations, linkingId: linkingId }}>
+    <LinkerContext.Provider value={{ ...mutations, linkingId: linkingId, parent, parentScrollLeft }}>
       <div className={cx('linker', linkingId ? 'linking' : '')}>
         {children}
         {arrows.map(a => <Arrow {...a} />)}
+        {linkingObj && <UnlinkedArrow obj={linkingObj} />}
       </div>
     </LinkerContext.Provider>
   )

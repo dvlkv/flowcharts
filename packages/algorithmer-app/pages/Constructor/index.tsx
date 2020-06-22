@@ -1,8 +1,8 @@
-import { createContext, Fragment, Ref } from "preact";
-import { PropRef, useContext, useEffect, useRef, useState } from "preact/hooks";
+import { Fragment } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { memo } from "preact/compat";
-import { LinkerContext, Linker } from "./components/Arrow";
-import { cx } from "../../../algorithmer-utils";
+import { Linker } from "./components/Linker";
+import { ConstructorBlock } from "./components/ConstructorBlock";
 
 require('./index.less');
 
@@ -14,53 +14,20 @@ const ConstructorStep = memo(({ children }: any) => {
   )
 });
 
-const ConstructorBlock = memo(({ id }: any) => {
-  let ref = useRef<HTMLDivElement>();
-  const linker = useContext(LinkerContext);
-  const [rect, setRect] = useState<DOMRect | null>(null);
-  useEffect(() => {
-    if (!ref.current) {
-      return;
-    }
-    let rect = ref.current.getBoundingClientRect();
-    setRect(rect);
-    linker!.useObject(id, {
-      endX: rect.x + rect.width - 12,
-      endY: rect.y + rect.height / 2,
-      startX: rect.x,
-      startY: rect.y + rect.height / 2
-    });
-  }, [ref]);
-
-  const startLinking = (e: Event) => {
-    linker!.startLinking(id);
-    e.stopPropagation();
-  };
-
-  const endLinking = () => {
-    linker!.endLinking(id);
-  }
-
-  return (
-    <div onClick={endLinking} className={cx('constructor-block', (linker?.linkingId && linker.linkingId !== id) ? 'linking' : '')} ref={ref}>
-      {id}
-      <div className={'dot-inner'} onClick={startLinking}>
-        <div className={'dot-outer'} />
-      </div>
-    </div>
-  )
-});
-
 const ConstructorBranch = memo(({ children }: any) => {
   let container = useRef<HTMLDivElement>();
   let [position, setPosition] = useState<DOMRect | null>(null);
+  let [scrollLeft, setScrollLeft] = useState<number>(0);
   useEffect(() => {
     setPosition(container.current!.getBoundingClientRect());
   }, [container]);
   return (
-    <div ref={container} className={'constructor-branch-outer'}>
+    <div ref={container} className={'constructor-branch-outer'} onScroll={() => setScrollLeft(container.current!.scrollLeft)}>
       <div className={'constructor-branch'}>
-        <Linker parent={position} mappings={[
+        <Linker
+          parent={position}
+          parentScrollLeft={scrollLeft}
+          mappings={[
           ['kek', 'lol'],
           ['kek', 'flex'],
           ['kek', 'test'],
@@ -68,7 +35,8 @@ const ConstructorBranch = memo(({ children }: any) => {
           ['flex', 'lel'],
           ['lel2', 'lol2'],
           ['test', 'lel']
-        ]}>
+        ]}
+        >
           {children}
         </Linker>
       </div>
