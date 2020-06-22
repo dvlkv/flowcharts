@@ -3,3 +3,49 @@
   width: 100%;
   background-color: #eff2f3;
 }
+
+.constructor-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin-right: 128px;
+}
+
+
+.constructor-branch-outer {
+  overflow-x: auto;
+  position: relative;
+}
+.constructor-branch {
+  width: 100%;
+  padding: 12px 24px;
+  display: flex;
+  flex-direction: row;
+
+  &:before {
+    height: 1px;
+    background-color: black;
+    display: block;
+  }
+
+  &:after {
+    width: 100%;
+    height: 1px;
+    display: block;
+  }
+}
+
+
+.constructor-block {
+  width: 240px;
+  min-height: 80px;
+  background-color: white;
+  border: silver solid 2px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

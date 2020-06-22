@@ -4,11 +4,11 @@ if (process.env.NODE_ENV==='development') {
   // to exist at the top of a file.
   require("preact/debug");
 }
+require('./reset.css');
 
 import { render } from 'preact';
 import App from "./pages";
 import { LocaleProvider } from "../algorithmer-locale";
-require('./reset.css');
 
 render(
   <LocaleProvider defaultLocale={'RU'}>
