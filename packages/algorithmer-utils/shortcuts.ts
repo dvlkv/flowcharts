@@ -9,16 +9,16 @@ export const useShortcuts = (shortcuts: Shortcut[]) => {
   }
 
   useEffect(() => {
-    let listner = (e: KeyboardEvent) => {
+    let listener = (e: KeyboardEvent) => {
       let handler = shortcutsMap.get(e.code);
       if (handler) {
         handler();
       }
     };
 
-    document.addEventListener('keydown', listner);
+    document.addEventListener('keydown', listener);
     return () => {
-      document.removeEventListener('keydown', listner);
+      document.removeEventListener('keydown', listener);
     }
   });
-}
+};

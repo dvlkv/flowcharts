@@ -1,23 +1,46 @@
 import { memo } from "preact/compat";
 import { createContext } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
+import { useShortcuts } from "../../../../algorithmer-utils/shortcuts";
+import { cx } from "../../../../algorithmer-utils";
+
+const useMousePosition = () => {
+  let [mousePos, setMousePos] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: e.x,
+        y: e.y
+      });
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+  }, []);
+
+  return mousePos;
+};
 
 const Arrow = memo(({ from, to }: any) => {
-  let path = `M0 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
-  let hLen = (to.x - from.x - 28) / 2;
+  let path = `M0.5 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
+  let hLen = (to.x - from.x - 18) / 2;
   let vLen = to.y - from.y;
-  if (vLen == 0) {
+
+  let bezierParameter = 5;
+  if (Math.abs(vLen) < 10) {
     path += ` h ${to.x - from.x - 8}`;
   } else {
     path += ` h ${hLen}`;
     if (vLen > 0) {
-      path += ` q 10 0 10 10`;
-      path += ` v ${vLen - 20}`;
-      path += ` q 0 10 10 10`;
+      path += ` q ${bezierParameter} 0 ${bezierParameter} ${bezierParameter}`;
+      path += ` v ${vLen - 10}`;
+      path += ` q 0 ${bezierParameter} ${bezierParameter} ${bezierParameter}`;
     } else {
-      path += ` q 10 0 10 -10`;
-      path += ` v ${vLen + 25}`;
-      path += ` q 0 -10 10 -10`;
+      path += ` q ${bezierParameter} 0 ${bezierParameter} -${bezierParameter}`;
+      path += ` v ${vLen + 10}`;
+      path += ` q 0 -${bezierParameter} ${bezierParameter} -${bezierParameter}`;
     }
 
     path += ` h ${hLen}`;
@@ -28,7 +51,8 @@ const Arrow = memo(({ from, to }: any) => {
       left: Math.min(from.x, to.x),
       top: Math.min(from.y, to.y) - 10,
       width: Math.abs(to.x - from.x) + 5,
-      height: Math.abs(to.y - from.y) + 20
+      height: Math.abs(to.y - from.y) + 20,
+      pointerEvents: 'none'
     }}
     >
       <defs>
@@ -51,32 +75,48 @@ const Arrow = memo(({ from, to }: any) => {
   )
 });
 
+type LinkerObject = { startX: number, startY: number, endX: number, endY: number };
 
 type ArrowsState = {
-  objects: Map<string, { startX: number, startY: number, endX: number, endY: number }>
+  objects: Map<string, LinkerObject>
 }
 
 type ArrowsMutations = {
-  useObject: (id: string, obj: { startX: number, startY: number, endX: number, endY: number }) => void,
+  useObject: (id: string, obj: LinkerObject) => void,
+  startLinking: (id: string) => void,
+  endLinking: (id: string) => void,
 }
 
-export const ArrowsContext = createContext<ArrowsState & ArrowsMutations | null>(null);
-export const ArrowsRoot = memo(({ children, mappings, parent }: any) => {
+export const LinkerContext = createContext<ArrowsState & ArrowsMutations & { linkingId: string | undefined } | null>(null);
+export const Linker = memo(({ children, mappings, parent }: any) => {
   let [state, mutate] = useState<ArrowsState>({
     objects: new Map<string, { startX: number, startY: number, endX: number, endY: number }>(),
   });
 
+  let [linkingId, setLinkingId] = useState<string | undefined>(undefined);
+  let [maps, setMappings] = useState<[string, string][]>(mappings);
 
   const mutations: ArrowsMutations = {
     useObject: (id: string, obj) => {
       mutate({
-        objects: state.objects.set(id, obj)
+        ...state,
+        objects: state.objects.set(id, obj),
       });
+    },
+    startLinking: (id) => {
+      setMappings(maps.filter(a => a[0] != id));
+      setLinkingId(id);
+    },
+    endLinking: (id) => {
+      if (linkingId && linkingId !== id) {
+        setMappings(maps.concat([[linkingId, id]]));
+        setLinkingId(undefined);
+      }
     }
   };
 
   let arrows = [];
-  for (let [leftId, rightId] of mappings) {
+  for (let [leftId, rightId] of maps) {
     let left = state.objects.get(leftId);
     let right = state.objects.get(rightId);
     if (!left || !right) {
@@ -95,10 +135,36 @@ export const ArrowsRoot = memo(({ children, mappings, parent }: any) => {
     })
   }
 
+  let mousePos = useMousePosition();
+  useShortcuts([{
+    code: 'Escape',
+    handler: () => {
+      setLinkingId(undefined);
+    }
+  }]);
+
+  if (linkingId) {
+    let linkingObj = state.objects.get(linkingId);
+    if (linkingObj) {
+      arrows.push({
+        from: {
+          x: linkingObj.endX - parent.x,
+          y: linkingObj.endY - parent.y,
+        },
+        to: {
+          x: Math.max(linkingObj.endX - parent.x + 20, mousePos.x - parent.x),
+          y: mousePos.y - parent.y
+        }
+      });
+    }
+  }
+
   return (
-    <ArrowsContext.Provider value={{ ...state, ...mutations }}>
+    <LinkerContext.Provider value={{ ...state, ...mutations, linkingId: linkingId }}>
+      <div className={cx('linker', linkingId ? 'linking' : '')}>
         {children}
         {arrows.map(a => <Arrow {...a} />)}
-    </ArrowsContext.Provider>
+      </div>
+    </LinkerContext.Provider>
   )
 });

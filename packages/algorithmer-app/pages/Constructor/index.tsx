@@ -1,7 +1,8 @@
 import { createContext, Fragment, Ref } from "preact";
 import { PropRef, useContext, useEffect, useRef, useState } from "preact/hooks";
 import { memo } from "preact/compat";
-import { ArrowsContext, ArrowsRoot } from "./components/Arrow";
+import { LinkerContext, Linker } from "./components/Arrow";
+import { cx } from "../../../algorithmer-utils";
 
 require('./index.less');
 
@@ -15,23 +16,37 @@ const ConstructorStep = memo(({ children }: any) => {
 
 const ConstructorBlock = memo(({ id }: any) => {
   let ref = useRef<HTMLDivElement>();
-  const arrows = useContext(ArrowsContext);
+  const linker = useContext(LinkerContext);
+  const [rect, setRect] = useState<DOMRect | null>(null);
   useEffect(() => {
     if (!ref.current) {
       return;
     }
     let rect = ref.current.getBoundingClientRect();
-    arrows!.useObject(id, {
-      endX: rect.x + rect.width - 10,
+    setRect(rect);
+    linker!.useObject(id, {
+      endX: rect.x + rect.width - 12,
       endY: rect.y + rect.height / 2,
       startX: rect.x,
       startY: rect.y + rect.height / 2
     });
   }, [ref]);
 
+  const startLinking = (e: Event) => {
+    linker!.startLinking(id);
+    e.stopPropagation();
+  };
+
+  const endLinking = () => {
+    linker!.endLinking(id);
+  }
+
   return (
-    <div className={'constructor-block'} ref={ref}>
+    <div onClick={endLinking} className={cx('constructor-block', (linker?.linkingId && linker.linkingId !== id) ? 'linking' : '')} ref={ref}>
       {id}
+      <div className={'dot-inner'} onClick={startLinking}>
+        <div className={'dot-outer'} />
+      </div>
     </div>
   )
 });
@@ -45,17 +60,17 @@ const ConstructorBranch = memo(({ children }: any) => {
   return (
     <div ref={container} className={'constructor-branch-outer'}>
       <div className={'constructor-branch'}>
-        <ArrowsRoot parent={position} mappings={[
+        <Linker parent={position} mappings={[
           ['kek', 'lol'],
           ['kek', 'flex'],
           ['kek', 'test'],
           ['lol', 'lel'],
           ['flex', 'lel'],
-          ['lel', 'lel2'],
-          ['lel2', 'lol2']
+          ['lel2', 'lol2'],
+          ['test', 'lel']
         ]}>
           {children}
-        </ArrowsRoot>
+        </Linker>
       </div>
     </div>
   );
