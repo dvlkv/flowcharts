@@ -6,15 +6,15 @@ import { ConstructorBlock } from "./components/ConstructorBlock";
 
 require('./index.less');
 
-const ConstructorStep = memo(({ children }: any) => {
+const ConstructorStep = memo(({ data }: any) => {
   return (
     <div className={'constructor-step'}>
-      {children}
+      {data.map((a: any) => <ConstructorBlock id={a.id}/>)}
     </div>
   )
 });
 
-const ConstructorBranch = memo(({ children }: any) => {
+const ConstructorBranch = memo(({ data }: any) => {
   let container = useRef<HTMLDivElement>();
   let [position, setPosition] = useState<DOMRect | null>(null);
   let [scrollLeft, setScrollLeft] = useState<number>(0);
@@ -27,17 +27,9 @@ const ConstructorBranch = memo(({ children }: any) => {
         <Linker
           parent={position}
           parentScrollLeft={scrollLeft}
-          mappings={[
-          ['kek', 'lol'],
-          ['kek', 'flex'],
-          ['kek', 'test'],
-          ['lol', 'lel'],
-          ['flex', 'lel'],
-          ['lel2', 'lol2'],
-          ['test', 'lel']
-        ]}
+          mappings={data.connections}
         >
-          {children}
+          {data.steps.map((a: any) => <ConstructorStep data={a} />)}
         </Linker>
       </div>
     </div>
@@ -48,25 +40,14 @@ const Constructor = memo(() => {
   return (
     <Fragment>
       <h1>Конструктор</h1>
-      <ConstructorBranch>
-        <ConstructorStep>
-          <ConstructorBlock id={'kek'}/>
-        </ConstructorStep>
-        <ConstructorStep>
-          <ConstructorBlock id={'flex'}/>
-          <ConstructorBlock id={'lol'}/>
-          <ConstructorBlock id={'test'}/>
-        </ConstructorStep>
-        <ConstructorStep>
-          <ConstructorBlock id={'lel'}/>
-        </ConstructorStep>
-        <ConstructorStep>
-          <ConstructorBlock id={'lel2'}/>
-        </ConstructorStep>
-        <ConstructorStep>
-          <ConstructorBlock id={'lol2'}/>
-        </ConstructorStep>
-      </ConstructorBranch>
+      <ConstructorBranch data={{
+        steps: [[{ id: 'kek' }], [{ id: 'flex' }, { id: 'lol' }, { id: 'test' }], [{ id: 'lel' }]],
+        connections: [
+          ['kek', 'flex'],
+          ['lol', 'lel'],
+          ['test', 'lel']
+        ]
+      }} />
     </Fragment>
 
     // <CanvasContextProvider>

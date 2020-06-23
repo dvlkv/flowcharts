@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  margin-right: 128px;
+  margin-right: 64px;
 }
 
 
@@ -52,7 +52,7 @@
   }
 
   &.drag-over {
-    padding-top: 104px;
+    padding-top: 100px;
 
     & * {
       pointer-events: none;
@@ -74,6 +74,10 @@
   }
   &.linking:hover {
     border: blue solid 2px;
+  }
+
+  &.dragging {
+    opacity: 0.5;
   }
 
   .dot-inner {

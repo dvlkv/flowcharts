@@ -1,10 +1,11 @@
 import { memo } from "preact/compat";
 import { createContext } from "preact";
-import { useContext, useEffect, useState } from "preact/hooks";
+import { useContext, useEffect, useReducer, useState } from "preact/hooks";
 import { useMouse, useShortcuts } from "../../../../algorithmer-utils/shortcuts";
 import { cx } from "../../../../algorithmer-utils";
+import { act } from "preact/test-utils";
 
-export const LinkerContext = createContext<ArrowsMutations & { linkingId: string | undefined, parent: DOMRect, parentScrollLeft: number } | null>(null);
+export const LinkerContext = createContext<ArrowsMutations & { linkingId: string | null, parent: DOMRect, parentScrollLeft: number } | null>(null);
 
 const Arrow = memo(({ from, to }: any) => {
   let path = `M0.5 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
@@ -81,52 +82,89 @@ const UnlinkedArrow = memo(({ obj }: any) => {
 });
 
 type LinkerObject = { startX: number, startY: number, endX: number, endY: number };
-
-type ArrowsState = {
-  objects: Map<string, LinkerObject>
-}
-
 type ArrowsMutations = {
-  useObject: (id: string, obj: LinkerObject | null) => void,
+  useObject: (id: string, obj: (() => LinkerObject) | null) => void,
+  refresh: (id: string) => void,
+  refreshAll: () => void,
   startLinking: (id: string) => void,
   endLinking: (id: string) => void,
 }
+
+type LinkerState = {
+  objects: Map<string, () => LinkerObject>,
+  maps: [string, string][],
+  positions: Map<string, LinkerObject>,
+  linkingId: string | null
+}
+
+type LinkerActions = { type: 'USE_OBJECT', id: string, factory: (() => LinkerObject) | null } |
+  { type: 'START_LINKING', id: string | null } |
+  { type: 'END_LINKING', id: string } |
+  { type: 'REFRESH_OBJECT', id: string } |
+  { type: 'REFRESH_ALL' }
+
 export const Linker = memo(({ children, mappings, parent, parentScrollLeft }: any) => {
-  let [state, mutate] = useState<ArrowsState>({
-    objects: new Map<string, { startX: number, startY: number, endX: number, endY: number }>(),
+  const [state, dispatch] = useReducer<LinkerState, LinkerActions>((prevState, action) => {
+    if (action.type === 'USE_OBJECT') {
+      if (!action.factory) {
+        prevState.objects.delete(action.id);
+        prevState.positions.delete(action.id);
+      } else {
+        prevState.objects.set(action.id, action.factory);
+        prevState.positions.set(action.id, action.factory());
+      }
+    }
+    if (action.type === 'REFRESH_OBJECT') {
+      let factory = prevState.objects.get(action.id);
+      if (factory) {
+        prevState.positions.set(action.id, factory());
+      }
+    }
+    if (action.type === 'REFRESH_ALL') {
+      for (let [id, factory] of prevState.objects.entries()) {
+        prevState.positions.set(id, factory());
+      }
+    }
+    if (action.type === 'START_LINKING') {
+      prevState.linkingId = action.id;
+      prevState.maps = prevState.maps.filter(a => a[0] !== prevState.linkingId);
+    }
+    if (action.type === 'END_LINKING') {
+      if (prevState.linkingId) {
+        prevState.maps.push([prevState.linkingId, action.id]);
+        prevState.linkingId = null;
+      }
+    }
+    return { ...prevState };
+  }, {
+    objects: new Map<string, () => LinkerObject>(),
+    maps: [],
+    positions: new Map<string, LinkerObject>(),
+    linkingId: null
   });
 
-  let [linkingId, setLinkingId] = useState<string | undefined>(undefined);
-  let [maps, setMappings] = useState<[string, string][]>(mappings);
-
   const mutations: ArrowsMutations = {
-    useObject: (id: string, obj) => {
-      if (obj) {
-        state.objects.set(id, obj);
-      } else {
-        state.objects.delete(id);
-      }
-      mutate({
-        ...state,
-        objects: state.objects,
-      });
+    useObject: (id: string, factory: (() => LinkerObject) | null) => {
+      dispatch({ type: 'USE_OBJECT', id, factory });
     },
     startLinking: (id) => {
-      setMappings(maps.filter(a => a[0] != id));
-      setLinkingId(id);
+      dispatch({ type: "START_LINKING", id });
     },
     endLinking: (id) => {
-      if (linkingId && linkingId !== id) {
-        setMappings(maps.concat([[linkingId, id]]));
-        setLinkingId(undefined);
-      }
+      dispatch({ type: "END_LINKING", id });
+    },
+    refresh: (id) => {
+      dispatch({ type: "REFRESH_OBJECT", id });
+    },
+    refreshAll: () => {
+      dispatch({ type: "REFRESH_ALL" });
     }
   };
 
   let arrows = [];
-  for (let [leftId, rightId] of maps) {
-    let left = state.objects.get(leftId);
-    let right = state.objects.get(rightId);
+  for (let [leftId, rightId] of state.maps) {
+    let left = state.positions.get(leftId);
+    let right = state.positions.get(rightId);
     if (!left || !right) {
       continue;
     }
@@ -146,18 +184,18 @@ export const Linker = memo(({ children, mappings, parent, parentScrollLeft }: an
   useShortcuts([{
     code: 'Escape',
     handler: () => {
-      setLinkingId(undefined);
+      dispatch({ type: "START_LINKING", id: null });
     }
   }]);
 
   let linkingObj: any;
-  if (linkingId) {
-    linkingObj = state.objects.get(linkingId);
+  if (state.linkingId) {
+    linkingObj = state.positions.get(state.linkingId);
   }
 
   return (
-    <LinkerContext.Provider value={{ ...mutations, linkingId: linkingId, parent, parentScrollLeft }}>
-      <div className={cx('linker', linkingId ? 'linking' : '')}>
+    <LinkerContext.Provider value={{ ...mutations, linkingId: state.linkingId, parent, parentScrollLeft }}>
+      <div className={cx('linker', state.linkingId ? 'linking' : '')}>
         {children}
         {arrows.map(a => <Arrow {...a} />)}
         {linkingObj && <UnlinkedArrow obj={linkingObj} />}
