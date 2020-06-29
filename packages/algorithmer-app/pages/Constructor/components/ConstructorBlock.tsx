@@ -1,25 +1,39 @@
 import { memo, Fragment } from "preact/compat";
 import { useContext, useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { LinkerContext } from "./Linker";
+import { LinkerContext, LinkerObject } from "./Linker/context";
 import { cx } from "../../../../algorithmer-utils";
 
-export const ConstructorBlock = memo(({ id }: any) => {
+export const ConstructorBlock = memo(({ id, type, step }: any) => {
   const linker = useContext(LinkerContext);
 
   const ref = useRef<HTMLDivElement>();
+  const canBeLinkedWith = (obj: LinkerObject) => {
+    if (obj.id === id) {
+      return false;
+    }
+    console.log(obj, id, type, step);
+    return obj.meta.step + 1 === step;
+  };
   useEffect(() => {
     if (!linker || !ref.current) {
       return;
     }
 
-    linker!.useObject(id, () => {
-      let rect = ref.current!.getBoundingClientRect();
-      return {
-        endX: rect.x + rect.width - 12,
-        endY: rect.y + rect.height / 2,
-        startX: rect.x,
-        startY: rect.y + rect.height / 2
-      };
+    linker!.useObject(id, {
+      factory: () => {
+        let rect = ref.current!.getBoundingClientRect();
+        return {
+          endX: rect.x + rect.width - 12,
+          endY: rect.y + rect.height / 2,
+          startX: rect.x,
+          startY: rect.y + rect.height / 2,
+        };
+      },
+      canLinkWith: canBeLinkedWith,
+      meta: {
+        type: type,
+        step: step,
+      }
     });
   }, [ref]);
 
@@ -48,17 +62,9 @@ export const ConstructorBlock = memo(({ id }: any) => {
 
   useEffect(() => {
     if (dragging) {
-      linker!.useObject(id, null);
+      linker!.detach(id);
     } else {
-      linker!.useObject(id, () => {
-        let rect = ref.current!.getBoundingClientRect();
-        return {
-          endX: rect.x + rect.width - 12,
-          endY: rect.y + rect.height / 2,
-          startX: rect.x,
-          startY: rect.y + rect.height / 2
-        };
-      });
+      linker!.attach(id);
       linker?.refreshAll();
     }
   }, [dragging]);
@@ -100,13 +106,13 @@ export const ConstructorBlock = memo(({ id }: any) => {
       >
         <div
           onClick={endLinking}
-          className={cx('constructor-block', (linker?.linkingId && linker.linkingId !== id) && 'linking', dragging && 'dragging')}
+          className={cx('constructor-block', linker?.linking && canBeLinkedWith(linker.linking) && 'linking', dragging && 'dragging')}
           ref={ref}
           draggable
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
         >
-          Выполнить
+          {type} {id}
           <div className={'dot-inner'} onClick={startLinking}>
             <div className={'dot-outer'}/>
           </div>

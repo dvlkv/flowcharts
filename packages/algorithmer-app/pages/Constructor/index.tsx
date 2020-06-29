@@ -1,15 +1,16 @@
 import { Fragment } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { memo } from "preact/compat";
-import { Linker } from "./components/Linker";
+import Linker from "./components/Linker/Linker";
 import { ConstructorBlock } from "./components/ConstructorBlock";
 
 require('./index.less');
 
-const ConstructorStep = memo(({ data }: any) => {
+const ConstructorStep = memo(({ data, i }: any) => {
+  let type = i % 2 === 0 ? 'action' : 'subscription';
   return (
     <div className={'constructor-step'}>
-      {data.map((a: any) => <ConstructorBlock id={a.id}/>)}
+      {data.map((a: any) => <ConstructorBlock step={i} type={type} id={a.id}/>)}
     </div>
   )
 });
@@ -29,7 +30,7 @@ const ConstructorBranch = memo(({ data }: any) => {
           parentScrollLeft={scrollLeft}
           mappings={data.connections}
         >
-          {data.steps.map((a: any) => <ConstructorStep data={a} />)}
+          {data.steps.map((a: any, i: number) => <ConstructorStep i={i + 1} data={a} />)}
         </Linker>
       </div>
     </div>
