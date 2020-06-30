@@ -11,7 +11,6 @@ export const ConstructorBlock = memo(({ id, type, step }: any) => {
     if (obj.id === id) {
       return false;
     }
-    console.log(obj, id, type, step);
     return obj.meta.step + 1 === step;
   };
   useEffect(() => {

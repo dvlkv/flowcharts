@@ -25,12 +25,14 @@ const NavbarItem = memo((props: NavbarItemProps) => {
   );
 });
 
-const Navbar = memo(({ routes }: NavbarProps) => {
+const Nav = memo(({ routes }: NavbarProps) => {
   return (
-    <nav className={'navbar'}>
+    <div className={'navbar-outer'}>
+      <div className={'navbar-inner'}>
       {routes.map(a => <NavbarItem {...a} />)}
-    </nav>
+      </div>
+    </div>
   )
 });
 
-export default Navbar;
+export default Nav;

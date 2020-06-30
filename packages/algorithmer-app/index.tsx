@@ -4,7 +4,9 @@ if (process.env.NODE_ENV==='development') {
   // to exist at the top of a file.
   require("preact/debug");
 }
+
 require('./reset.css');
+require('./typography.less');
 
 import { render } from 'preact';
 import App from "./pages";

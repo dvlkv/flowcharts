@@ -43,6 +43,18 @@ module.exports = {
         // Transform our own .(less|css) files with PostCSS and CSS-modules
         test: /\.(less|css)$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'static/'
+            }
+          }
+        ]
       }
     ],
   },
@@ -56,7 +68,8 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Loading...',
-      template: 'packages/algorithmer-app/index.html'
+      template: 'packages/algorithmer-app/index.html',
+      inject: true
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
