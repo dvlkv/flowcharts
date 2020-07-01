@@ -7,7 +7,7 @@ import { Arrow, UnlinkedArrow } from "./Arrows";
 
 type LinkerState = {
   objects: Map<string, LinkerObject>,
-  maps: [string, string][],
+  maps: [string, string, string][],
   linkingId: string | null
 }
 
@@ -60,7 +60,7 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
       let linkingObj = prevState.objects.get(prevState.linkingId);
       let right = prevState.objects.get(action.id);
       if (linkingObj && right && right.canLinkWith(linkingObj)) {
-        prevState.maps.push([prevState.linkingId, action.id]);
+        prevState.maps.push([prevState.linkingId, action.id, '#2fb6ff']);
         prevState.linkingId = null;
       } else {
         return prevState;
@@ -109,7 +109,7 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
   };
 
   let arrows = [];
-  for (let [leftId, rightId] of state.maps) {
+  for (let [leftId, rightId, color] of state.maps) {
     let left = state.objects.get(leftId);
     let right = state.objects.get(rightId);
     if (!left || !right) {
@@ -127,7 +127,8 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
       to: {
         x: right.position.startX - parent.x,
         y: right.position.startY - parent.y
-      }
+      },
+      color: color
     })
   }
 
@@ -147,7 +148,7 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
     <LinkerContext.Provider value={{ ...mutations, linking: linkingObj, parent, parentScrollLeft }}>
       <div className={cx('linker', state.linkingId ? 'linking' : '')}>
         {children}
-        {arrows.map(a => <Arrow color={"#2fb6ff"} {...a} />)}
+        {arrows.map(a => <Arrow {...a} />)}
         {linkingObj && <UnlinkedArrow
           color={"#2fb6ff"}
             from={{

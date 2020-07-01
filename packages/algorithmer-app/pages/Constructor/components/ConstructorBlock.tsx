@@ -9,9 +9,10 @@ type ConstructorBlockProps = {
   type: 'action' | 'subscription',
   id: any,
   step: any,
+  text: string,
 }
 
-export const ConstructorBlock = memo(({ id, type, step }: ConstructorBlockProps) => {
+export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlockProps) => {
   const linker = useContext(LinkerContext);
 
   const ref = useRef<HTMLDivElement>();
@@ -56,25 +57,19 @@ export const ConstructorBlock = memo(({ id, type, step }: ConstructorBlockProps)
 
 
   return (
-    <div className={'constructor-block-outer'}>
-      <div
-        className={cx('constructor-block-inner', type)}
-        ref={ref}
-      >
-        <div
-          onClick={endLinking}
-          className={cx(
-            'constructor-block',
-            linker?.linking && canBeLinkedWith(linker.linking) && 'linking',
-            type
-          )}
-        >
-          <div className={'action-title'}>
-            <Span text={type === 'subscription' ? 'SUBSCRIPTION_BLOCK' : 'ACTION_BLOCK'}/>
-          </div>
-          {type} {id}
-        </div>
+    <div
+      onClick={endLinking}
+      className={cx(
+        'constructor-block',
+        linker?.linking && canBeLinkedWith(linker.linking) && 'linking',
+        type
+      )}
+      ref={ref}
+    >
+      <div className={'action-title'}>
+        <Span text={type === 'subscription' ? 'SUBSCRIPTION_BLOCK' : 'ACTION_BLOCK'}/>
       </div>
+      {text}
     </div>
   )
 });

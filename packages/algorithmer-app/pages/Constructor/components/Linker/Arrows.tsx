@@ -8,6 +8,8 @@ export const Arrow = memo(({ from, to, color }: any) => {
   let hLen = (to.x - from.x - 16) / 2;
   let vLen = to.y - from.y;
 
+  const id = Math.ceil(Math.random() * 1000);
+
   let bezierParameter = 5;
   if (Math.abs(vLen) < 10) {
     path += ` h ${to.x - from.x - 6}`;
@@ -36,7 +38,7 @@ export const Arrow = memo(({ from, to, color }: any) => {
     }}
     >
       <defs>
-        <marker id="arrowhead" markerWidth="5" markerHeight="5"
+        <marker id={"arrowhead-" + id} markerWidth="5" markerHeight="5"
                 refX="0" refY="2.5" orient="auto" fill={color}>
           <polygon points="0 0, 3 2.5, 0 5"/>
         </marker>
@@ -48,7 +50,7 @@ export const Arrow = memo(({ from, to, color }: any) => {
       </defs>
       {/*<path d='M0 5 h100 q 10 0 10 10 v 10 q 0 10 10 10 h 100' stroke={'black'} stroke-width={2}*/}
       {/*      marker-start={'url(#arrowback)'} marker-end={'url(#arrowhead)'} fill={'none'}>*/}
-      <path d={path} stroke={color} stroke-width={2} marker-end={'url(#arrowhead)'} fill={'none'}>
+      <path d={path} stroke={color} stroke-width={2} marker-end={`url(#arrowhead-${id})`} fill={'none'}>
       </path>
     </svg>
   )

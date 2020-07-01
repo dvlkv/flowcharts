@@ -4,23 +4,29 @@
   background-color: #eff2f3;
 }
 
-.constructor-page-header {
-  padding-left: 20px;
-  padding-top: 30px;
+.constructor-page {
+  height: calc(100% - 45px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  & > .constructor-page-header {
+    padding-left: 20px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+  }
 }
 
 .constructor-container {
-  padding: 20px 0;
-  overflow-x: auto;
-}
-
-.constructor-branch-outer {
-  position: relative; // required for linker
+  flex-grow: 1;
+  overflow: auto;
+  position: relative;
 }
 
 .constructor-branch {
   display: flex;
   flex-direction: row;
+  position: relative; // required for linker
 }
 
 .constructor-step {
@@ -30,14 +36,12 @@
 }
 
 
-.constructor-block-outer {
-  padding-bottom: 20px;
-  width: 280px;
-}
-
-.constructor-block-inner {
-  min-height: 80px;
+.constructor-block {
+  min-height: 200px;
   padding: 15px;
+  width: 280px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
   border-radius: 13px;
 
   &.subscription {
@@ -46,21 +50,8 @@
   }
 
   &.action {
-    border: solid 2px #ffb82f;
+    border: solid 2px #ebac0c;
     background-color: #f6f4ef;
-  }
-}
-
-.constructor-block {
-  &.linking {
-    cursor: pointer;
-  }
-  &.linking:hover {
-    border: blue solid 2px;
-  }
-
-  &.dragging {
-    opacity: 0.5;
   }
 
   & > .action-title {
