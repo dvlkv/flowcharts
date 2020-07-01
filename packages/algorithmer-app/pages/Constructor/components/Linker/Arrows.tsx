@@ -3,14 +3,14 @@ import { useContext } from "preact/hooks";
 import { useMouse } from "../../../../../algorithmer-utils/shortcuts";
 import { LinkerContext } from "./context";
 
-export const Arrow = memo(({ from, to }: any) => {
+export const Arrow = memo(({ from, to, color }: any) => {
   let path = `M0.5 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
-  let hLen = (to.x - from.x - 18) / 2;
+  let hLen = (to.x - from.x - 16) / 2;
   let vLen = to.y - from.y;
 
   let bezierParameter = 5;
   if (Math.abs(vLen) < 10) {
-    path += ` h ${to.x - from.x - 8}`;
+    path += ` h ${to.x - from.x - 6}`;
   } else {
     path += ` h ${hLen}`;
     if (vLen > 0) {
@@ -37,19 +37,18 @@ export const Arrow = memo(({ from, to }: any) => {
     >
       <defs>
         <marker id="arrowhead" markerWidth="5" markerHeight="5"
-                refX="0" refY="2.5" orient="auto">
-          <polygon points="0 0, 5 2.5, 0 5"/>
+                refX="0" refY="2.5" orient="auto" fill={color}>
+          <polygon points="0 0, 3 2.5, 0 5"/>
         </marker>
         <marker id="arrowback" markerWidth="5" markerHeight="5"
-                refX="0" refY="2.5" stroke={'black'} orient="auto">
+                refX="0" refY="2.5" stroke={color} orient="auto">
           {/*<polygon points="0 0, 0 5, 5 5, 5 0"/>*/}
           <circle r={1.2} cx={1.7} cy={2.5} />
         </marker>
       </defs>
       {/*<path d='M0 5 h100 q 10 0 10 10 v 10 q 0 10 10 10 h 100' stroke={'black'} stroke-width={2}*/}
       {/*      marker-start={'url(#arrowback)'} marker-end={'url(#arrowhead)'} fill={'none'}>*/}
-      <path d={path} stroke={'black'} stroke-width={2}
-            marker-start={'url(#arrowback)'} marker-end={'url(#arrowhead)'} fill={'none'}>
+      <path d={path} stroke={color} stroke-width={2} marker-end={'url(#arrowhead)'} fill={'none'}>
       </path>
     </svg>
   )
@@ -69,6 +68,6 @@ export const UnlinkedArrow = memo((props: any) => {
     }
   };
   return (
-    <Arrow from={props.from} to={to} />
+    <Arrow color={props.color} from={props.from} to={to} />
   )
 });

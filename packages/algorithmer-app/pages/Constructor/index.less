@@ -4,71 +4,54 @@
   background-color: #eff2f3;
 }
 
-.constructor-step {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  margin-right: 64px;
+.constructor-page-header {
+  padding-left: 20px;
+  padding-top: 30px;
 }
 
+.constructor-container {
+  padding: 20px 0;
+  overflow-x: auto;
+}
 
 .constructor-branch-outer {
-  overflow-x: auto;
-  position: relative;
-
-  &::before {
-    content: '';
-    height: 1px;
-    width: 100%;
-    margin: auto;
-    position: absolute;
-    background-color: black;
-    display: block;
-    top: 0;
-  }
-
-  &::after {
-    content: '';
-    height: 1px;
-    width: 100%;
-    position: absolute;
-    background-color: black;
-    display: block;
-    bottom: 0;
-  }
+  position: relative; // required for linker
 }
+
 .constructor-branch {
-  width: 100%;
-  padding: 24px 48px;
   display: flex;
   flex-direction: row;
 }
 
+.constructor-step {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+}
+
 
 .constructor-block-outer {
-  padding-bottom: 12px;
-  &:last-child {
-    padding-bottom: 0;
+  padding-bottom: 20px;
+  width: 280px;
+}
+
+.constructor-block-inner {
+  min-height: 80px;
+  padding: 15px;
+  border-radius: 13px;
+
+  &.subscription {
+    border: solid 2px #2fb6ff;
+    background-color: #eff1f6;
   }
 
-  &.drag-over {
-    padding-top: 100px;
-
-    & * {
-      pointer-events: none;
-    }
+  &.action {
+    border: solid 2px #ffb82f;
+    background-color: #f6f4ef;
   }
 }
 
 .constructor-block {
-  width: 240px;
-  min-height: 80px;
-  background-color: white;
-  border: silver solid 2px;
-  position: relative;
-  padding: 4px 8px;
-  border-radius: 4px;
-
   &.linking {
     cursor: pointer;
   }
@@ -80,33 +63,14 @@
     opacity: 0.5;
   }
 
-  .dot-inner {
-    position: absolute;
-    right: -2px;
-    bottom: calc(50% - 8px);
-    padding: 4px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &:hover {
-      cursor: pointer;
-    }
-    &:hover > .dot-outer {
-      border-color: blue;
-      border-style: solid;
-      border-width: 1px;
-      width: 6px;
-      height: 6px;
-    }
-
-    .dot-outer {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: lightgray;
-    }
+  & > .action-title {
+    font-size: 16px;
+    font-weight: 600;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    color: #161616;
   }
 }
 
