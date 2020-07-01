@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 let isProduction = process.env.NODE_ENV === 'production';
@@ -11,7 +11,7 @@ module.exports = {
     app:  path.join(__dirname, 'packages', 'algorithmer-app', 'index.tsx')
   },
   target: 'web',
-  mode: isProduction ? 'development' : 'production',
+  mode: isProduction ? 'production' : 'development',
   module: {
     rules: [
       {
@@ -21,7 +21,7 @@ module.exports = {
           options: {
             presets: [
               '@babel/preset-typescript',
-              '@babel/preset-env',
+              '@babel/preset-env'
             ],
             plugins: [
               ["transform-react-jsx", { pragma: "h", pragmaFrag: "Fragment" }],
@@ -69,8 +69,9 @@ module.exports = {
       chunkFilename: '[id].[contenthash].css',
     })
   ],
-  optimization: isProduction && {
-    minimizer: [new UglifyJsPlugin()],
+  optimization: {
+    minimize: isProduction,
+    minimizer: [new TerserPlugin()],
   },
   output: {
     filename: isProduction ? '[contenthash].js' : '[name].[contenthash].js',
