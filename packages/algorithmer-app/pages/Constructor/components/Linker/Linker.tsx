@@ -146,16 +146,14 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
 
   return (
     <LinkerContext.Provider value={{ ...mutations, linking: linkingObj, parent, parentScrollLeft }}>
-      <div className={cx('linker', state.linkingId ? 'linking' : '')}>
-        {children}
-        {arrows.map(a => <Arrow {...a} />)}
-        {linkingObj && <UnlinkedArrow
+      {children}
+      {arrows.map(a => <Arrow {...a} />)}
+      {linkingObj && <UnlinkedArrow
           color={"#2fb6ff"}
-            from={{
-          x: linkingObj.position.endX - parent.x,
-          y: linkingObj.position.endY - parent.y,
-        }} />}
-      </div>
+          from={{
+            x: linkingObj.position.endX - parent.x,
+            y: linkingObj.position.endY - parent.y,
+          }}/>}
     </LinkerContext.Provider>
   )
 });

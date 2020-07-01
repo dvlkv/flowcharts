@@ -4,12 +4,14 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+let isProduction = process.env.NODE_ENV === 'production';
+
 module.exports = {
   entry: {
     app:  path.join(__dirname, 'packages', 'algorithmer-app', 'index.tsx')
   },
   target: 'web',
-  mode: 'development',
+  mode: isProduction ? 'development' : 'production',
   module: {
     rules: [
       {
@@ -40,21 +42,12 @@ module.exports = {
         loader: "source-map-loader"
       },
       {
-        // Transform our own .(less|css) files with PostCSS and CSS-modules
         test: /\.(less|css)$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
       },
       {
-        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'static/'
-            }
-          }
-        ]
+        test: /\.(svg|png)/,
+        type: 'asset/resource'
       }
     ],
   },
@@ -72,16 +65,17 @@ module.exports = {
       inject: true
     }),
     new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css',
+      filename: isProduction ? '[contenthash].css' : '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css',
     })
   ],
-  optimization: {
+  optimization: isProduction && {
     minimizer: [new UglifyJsPlugin()],
   },
   output: {
-    filename: '[name].[contenthash].js',
+    filename: isProduction ? '[contenthash].js' : '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'static/[name].[hash][ext]'
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
@@ -89,4 +83,7 @@ module.exports = {
     compress: true,
     port: 9000
   },
+  experiments: {
+    asset: true
+  }
 };

@@ -3,6 +3,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { LinkerContext, LinkerObject } from "./Linker/context";
 import { cx } from "../../../../algorithmer-utils";
 import { Span } from "../../../../algorithmer-locale";
+import Button from "../../../../algorithmer-components/Button";
 
 
 type ConstructorBlockProps = {
@@ -45,20 +46,9 @@ export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlock
     });
   }, [ref]);
 
-  /* linking */
-  const startLinking = (e: Event) => {
-    linker!.startLinking(id);
-    e.stopPropagation();
-  };
-
-  const endLinking = () => {
-    linker!.endLinking(id);
-  };
-
 
   return (
     <div
-      onClick={endLinking}
       className={cx(
         'constructor-block',
         linker?.linking && canBeLinkedWith(linker.linking) && 'linking',
@@ -70,6 +60,7 @@ export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlock
         <Span text={type === 'subscription' ? 'SUBSCRIPTION_BLOCK' : 'ACTION_BLOCK'}/>
       </div>
       {text}
+      {type === 'action' && <Button className={cx('full-width', 'add-command-btn')} type={'orange'}>Добавить команду</Button>}
     </div>
   )
 });

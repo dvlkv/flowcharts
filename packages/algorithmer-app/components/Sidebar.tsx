@@ -1,5 +1,5 @@
 import { memo } from "preact/compat";
-import Logo from "./Logo";
+import Logo from '../static/logo.svg';
 require('./sidebar.less');
 
 
@@ -8,7 +8,7 @@ const Sidebar = memo(() => {
     <div className={'sidebar'}>
       <div className={'sidebar-inner'}>
         <div className={'logo-container'}>
-          <Logo />
+          <img src={Logo} />
         </div>
       </div>
     </div>
