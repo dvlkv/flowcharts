@@ -48,6 +48,13 @@ rules.push({
   test: /\.(svg|png)/,
   type: 'asset/resource'
 });
+rules.push({
+  test: /\.(eot|otf|ttf|woff2?)/,
+  type: 'asset/resource',
+  generator: {
+    filename: 'static/fonts/[hash][ext]'
+  }
+});
 
 module.exports = {
   entry: {
