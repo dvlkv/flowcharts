@@ -2,11 +2,13 @@
   "name": "algorithmer",
   "version": "1.0.0",
   "main": "index.js",
+  "private": true,
   "license": "MIT",
   "scripts": {
     "build": "webpack",
     "prod": "cross-env NODE_ENV=production webpack",
-    "watch": "webpack-dev-server"
+    "watch": "webpack-dev-server",
+    "deploy": "yarn prod && rsync -azP dist/* root@82.146.36.112:/var/www/html/"
   },
   "dependencies": {
     "preact": "^10.4.4",
