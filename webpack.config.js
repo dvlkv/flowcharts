@@ -6,6 +6,49 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 let isProduction = process.env.NODE_ENV === 'production';
 
+let rules = [];
+
+// typescript
+rules.push({
+      test: /\.tsx?$/,
+      use: [{
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            '@babel/preset-typescript',
+            '@babel/preset-env'
+          ],
+          plugins: [
+            ["transform-react-jsx", { pragma: "h", pragmaFrag: "Fragment" }],
+            ['babel-plugin-jsx-pragmatic', {
+              module: 'preact',
+              import: 'h',
+              export: 'h',
+            }],
+            ["@babel/plugin-proposal-class-properties"]
+          ]
+        }
+      }],
+      exclude: /node_modules/,
+});
+rules.push({
+  enforce: "pre",
+  test: /\.js$/,
+  loader: "source-map-loader"
+});
+
+// styles
+rules.push({
+  test: /\.(less|css)$/,
+  use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
+});
+
+// assets
+rules.push({
+  test: /\.(svg|png)/,
+  type: 'asset/resource'
+});
+
 module.exports = {
   entry: {
     app:  path.join(__dirname, 'packages', 'algorithmer-app', 'index.tsx')
@@ -13,43 +56,7 @@ module.exports = {
   target: 'web',
   mode: isProduction ? 'production' : 'development',
   module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-typescript',
-              '@babel/preset-env'
-            ],
-            plugins: [
-              ["transform-react-jsx", { pragma: "h", pragmaFrag: "Fragment" }],
-              ['babel-plugin-jsx-pragmatic', {
-                module: 'preact',
-                import: 'h',
-                export: 'h',
-              }],
-              ["@babel/plugin-proposal-class-properties"]
-            ]
-          }
-        }],
-        exclude: /node_modules/,
-      },
-      {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
-      },
-      {
-        test: /\.(less|css)$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
-      },
-      {
-        test: /\.(svg|png)/,
-        type: 'asset/resource'
-      }
-    ],
+    rules: rules,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.less'],
@@ -58,13 +65,14 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
+    new CleanWebpackPlugin(), // clears dist when dev server is running
+    new HtmlWebpackPlugin({ // generates html with substituted hash
       title: 'Loading...',
       template: 'packages/algorithmer-app/index.html',
-      inject: true
+      inject: true,
+      minify: isProduction
     }),
-    new MiniCssExtractPlugin({
+    new MiniCssExtractPlugin({ // extracts css to chunk files
       filename: isProduction ? '[contenthash].css' : '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css',
     })
