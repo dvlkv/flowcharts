@@ -46,9 +46,6 @@ const Content = memo(() => {
 const App = memo(() => {
   return (
     <Fragment>
-      <div className={'sidebar-container'}>
-        <Sidebar/>
-      </div>
       <div className={'content-container'}>
         <Content/>
       </div>

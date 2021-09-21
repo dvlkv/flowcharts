@@ -32,10 +32,10 @@ export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlock
       factory: () => {
         let rect = ref.current!.getBoundingClientRect();
         return {
-          endX: rect.x + rect.width - 1,
-          endY: rect.y + rect.height / 2,
-          startX: rect.x,
-          startY: rect.y + rect.height / 2,
+          endX: rect.x + rect.width / 2,
+          endY: rect.y + rect.height,
+          startX: rect.x + rect.width / 2,
+          startY: rect.y,
         };
       },
       canLinkWith: canBeLinkedWith,

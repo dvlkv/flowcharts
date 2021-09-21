@@ -4,53 +4,37 @@ import { useMouse } from "../../../../../algorithmer-utils/shortcuts";
 import { LinkerContext } from "./context";
 
 export const Arrow = memo(({ from, to, color }: any) => {
-  let path = `M0.5 ${to.y <= from.y ? Math.abs(to.y - from.y) + 10 : 10}`;
-  let hLen = (to.x - from.x - 16) / 2;
+  let path = `M1 0`;
+  let hLen = to.x - from.x;
   let vLen = to.y - from.y;
 
   const id = Math.ceil(Math.random() * 1000);
 
-  let bezierParameter = 5;
-  if (Math.abs(vLen) < 10) {
-    path += ` h ${to.x - from.x - 6}`;
+  if (Math.abs(hLen) < 10) {
+    path += ` v ${to.y - from.y}`;
   } else {
-    path += ` h ${hLen}`;
+    path += ` v ${vLen / 2}`;
     if (vLen > 0) {
-      path += ` q ${bezierParameter} 0 ${bezierParameter} ${bezierParameter}`;
-      path += ` v ${vLen - 10}`;
-      path += ` q 0 ${bezierParameter} ${bezierParameter} ${bezierParameter}`;
+      path += ` h ${hLen}`;
     } else {
-      path += ` q ${bezierParameter} 0 ${bezierParameter} -${bezierParameter}`;
-      path += ` v ${vLen + 10}`;
-      path += ` q 0 -${bezierParameter} ${bezierParameter} -${bezierParameter}`;
+      path += ` h ${hLen}`;
     }
 
-    path += ` h ${hLen}`;
+    path += ` v ${vLen / 2}`;
   }
   return (
     <svg style={{
       position: 'absolute',
       left: Math.min(from.x, to.x),
-      top: Math.min(from.y, to.y) - 10,
-      width: Math.abs(to.x - from.x) + 5,
-      height: Math.abs(to.y - from.y) + 20,
+      top: Math.min(from.y, to.y),
+      width: Math.max(Math.abs(to.x - from.x) + 2),
+      height: Math.abs(to.y - from.y),
       pointerEvents: 'none'
     }}
     >
-      <defs>
-        <marker id={"arrowhead-" + id} markerWidth="5" markerHeight="5"
-                refX="0" refY="2.5" orient="auto" fill={color}>
-          <polygon points="0 0, 3 2.5, 0 5"/>
-        </marker>
-        <marker id="arrowback" markerWidth="5" markerHeight="5"
-                refX="0" refY="2.5" stroke={color} orient="auto">
-          {/*<polygon points="0 0, 0 5, 5 5, 5 0"/>*/}
-          <circle r={1.2} cx={1.7} cy={2.5} />
-        </marker>
-      </defs>
       {/*<path d='M0 5 h100 q 10 0 10 10 v 10 q 0 10 10 10 h 100' stroke={'black'} stroke-width={2}*/}
       {/*      marker-start={'url(#arrowback)'} marker-end={'url(#arrowhead)'} fill={'none'}>*/}
-      <path d={path} stroke={color} stroke-width={2} marker-end={`url(#arrowhead-${id})`} fill={'none'}>
+      <path d={path} stroke={color} stroke-width={2} fill={'none'}>
       </path>
     </svg>
   )
