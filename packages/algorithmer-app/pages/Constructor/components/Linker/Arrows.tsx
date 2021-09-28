@@ -4,9 +4,11 @@ import { useMouse } from "../../../../../algorithmer-utils/shortcuts";
 import { LinkerContext } from "./context";
 
 export const Arrow = memo(({ from, to, color }: any) => {
-  let path = `M1 0`;
   let hLen = to.x - from.x;
   let vLen = to.y - from.y;
+
+  let path = `M${to.x < from.x ? (-hLen + 2) : 2} 0`;
+
 
   const id = Math.ceil(Math.random() * 1000);
 
@@ -27,7 +29,7 @@ export const Arrow = memo(({ from, to, color }: any) => {
       position: 'absolute',
       left: Math.min(from.x, to.x),
       top: Math.min(from.y, to.y),
-      width: Math.max(Math.abs(to.x - from.x) + 2),
+      width: Math.abs(to.x - from.x) + 4,
       height: Math.abs(to.y - from.y),
       pointerEvents: 'none'
     }}

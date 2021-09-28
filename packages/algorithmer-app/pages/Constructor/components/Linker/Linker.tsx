@@ -1,5 +1,5 @@
 import { memo } from "preact/compat";
-import { useReducer } from "preact/hooks";
+import { useEffect, useMemo, useReducer, useState } from "preact/hooks";
 import { useShortcuts } from "../../../../../algorithmer-utils/shortcuts";
 import { cx } from "../../../../../algorithmer-utils";
 import { ArrowsMutations, LinkerContext, LinkerObject, LinkerObjectDescriptor } from "./context";
@@ -108,29 +108,32 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
     }
   };
 
-  let arrows = [];
-  for (let [leftId, rightId, color] of state.maps) {
-    let left = state.objects.get(leftId);
-    let right = state.objects.get(rightId);
-    if (!left || !right) {
-      continue;
+  let arrows = useMemo<{ from: any, to: any, color: string }[]>(() => {
+    let newArrows = []
+    for (let [leftId, rightId, color] of state.maps) {
+      let left = state.objects.get(leftId);
+      let right = state.objects.get(rightId);
+      if (!left || !right) {
+        continue;
+      }
+      if (!left.attached || !right.attached) {
+        continue;
+      }
+  
+      newArrows.push({
+        from: {
+          x: left.position.endX - parent.x,
+          y: left.position.endY - parent.y,
+        },
+        to: {
+          x: right.position.startX - parent.x,
+          y: right.position.startY - parent.y
+        },
+        color: color
+      })
     }
-    if (!left.attached || !right.attached) {
-      continue;
-    }
-
-    arrows.push({
-      from: {
-        x: left.position.endX - parent.x,
-        y: left.position.endY - parent.y,
-      },
-      to: {
-        x: right.position.startX - parent.x,
-        y: right.position.startY - parent.y
-      },
-      color: color
-    })
-  }
+    return newArrows
+  }, [state, ])
 
   useShortcuts([{
     code: 'Escape',

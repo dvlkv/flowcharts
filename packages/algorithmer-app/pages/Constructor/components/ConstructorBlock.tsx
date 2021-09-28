@@ -47,6 +47,8 @@ export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlock
   }, [ref]);
 
 
+
+
   return (
     <div
       className={cx(
