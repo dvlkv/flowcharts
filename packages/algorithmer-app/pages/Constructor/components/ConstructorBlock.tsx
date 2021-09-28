@@ -4,6 +4,7 @@ import { LinkerContext, LinkerObject } from "./Linker/context";
 import { cx } from "../../../../algorithmer-utils";
 import { Span } from "../../../../algorithmer-locale";
 import Button from "../../../../algorithmer-components/Button";
+import { useWindowSize } from "../../../../algorithmer-utils/resize";
 
 
 type ConstructorBlockProps = {
@@ -15,6 +16,7 @@ type ConstructorBlockProps = {
 
 export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlockProps) => {
   const linker = useContext(LinkerContext);
+  const windowSize = useWindowSize();
 
   const ref = useRef<HTMLDivElement>();
   const canBeLinkedWith = (obj: LinkerObject) => {
@@ -44,7 +46,7 @@ export const ConstructorBlock = memo(({ id, type, step, text }: ConstructorBlock
         step: step,
       }
     });
-  }, [ref]);
+  }, [ref, windowSize]);
 
 
 

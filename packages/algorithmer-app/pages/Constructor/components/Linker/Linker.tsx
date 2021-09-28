@@ -133,7 +133,7 @@ export default memo(({ children, mappings, parent, parentScrollLeft }: any) => {
       })
     }
     return newArrows
-  }, [state, ])
+  }, [state])
 
   useShortcuts([{
     code: 'Escape',
